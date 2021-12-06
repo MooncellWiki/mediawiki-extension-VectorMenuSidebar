@@ -23,7 +23,7 @@ jobs:
           PKG_NAME=VectorMenuSidebar-master-v${PROJECT_VERSION}.tar.gz
           echo ::set-output name=PKG_NAME::${PKG_NAME}
       - name: zip
-        run: tar -xzvf ${steps.package.outputs.PKG_NAME} i18n/ resoureces/ README.md VectorMenuSidebar.class.php extension.json
+        run: tar -xzvf ${{ steps.package.outputs.PKG_NAME }} i18n/ resoureces/ README.md VectorMenuSidebar.class.php extension.json
       - name: "Artifact upload: tarball"
         uses: actions/upload-artifact@master
         with:
