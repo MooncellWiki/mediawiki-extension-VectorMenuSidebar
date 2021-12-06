@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Extract information
+        id: package
         shell: bash
         run: |
           PROJECT_VERSION=$(echo $(sed -n 's/"version": "\(.*\)",/\1/p' extension.json | head -n1))
