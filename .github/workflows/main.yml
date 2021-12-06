@@ -18,7 +18,7 @@ jobs:
       - name: Extract information
         shell: bash
         run: |
-          PROJECT_VERSION=$(echo $(sed -n 's/"version": "\(.*\)",/\1/p' test.json | head -n1))
+          PROJECT_VERSION=$(echo $(sed -n 's/"version": "\(.*\)",/\1/p' extension.json | head -n1))
           PKG_NAME=VectorMenuSidebar-master-v${PROJECT_VERSION}.tar.gz
           echo ::set-output name=PKG_NAME::${PKG_NAME}
       - name: zip
