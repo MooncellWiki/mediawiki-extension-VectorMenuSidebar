@@ -5,13 +5,16 @@ on:
   push:
     tags:
       - 'v*'
-      
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Extract information
         id: package
         shell: bash
@@ -19,27 +22,20 @@ jobs:
           PROJECT_VERSION=$(echo $(sed -n 's/"version": "\(.*\)",/\1/p' extension.json | head -n1))
           PROJECT_NAME=$(echo $(sed -n 's/"name": "\(.*\)",/\1/p' extension.json | head -n1))
           PKG_NAME=${PROJECT_NAME}-master-v${PROJECT_VERSION}.tar.gz
-          echo ::set-output name=PKG_NAME::${PKG_NAME}
-          echo ::set-output name=PROJECT_NAME::${PROJECT_NAME}
+          echo "PKG_NAME=${PKG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "PROJECT_NAME=${PROJECT_NAME}" >> "$GITHUB_OUTPUT"
       - name: zip
         run: |
           mkdir ${{ steps.package.outputs.PROJECT_NAME }}
           cp -r i18n/ resources/ extension.json VectorMenuSidebar.class.php README.md ${{ steps.package.outputs.PROJECT_NAME }}
           tar -czvf ${{ steps.package.outputs.PKG_NAME }} ${{ steps.package.outputs.PROJECT_NAME }}
       - name: "Artifact upload: tarball"
-        uses: actions/upload-artifact@master
-        with:
-          name: ${{ steps.package.outputs.PKG_NAME }}
-          path: ${{ steps.package.outputs.PKG_NAME }}
-      - name: "Artifact upload: tarball"
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.package.outputs.PKG_NAME }}
           path: ${{ steps.package.outputs.PKG_NAME }}
       - name: Publish archives and packages
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ${{ steps.package.outputs.PKG_NAME }}
+        if: startsWith(github.ref, 'refs/tags/')
+        run: gh release create "$GITHUB_REF_NAME" "${{ steps.package.outputs.PKG_NAME }}" --generate-notes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
