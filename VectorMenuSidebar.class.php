@@ -13,7 +13,7 @@ class VectorMenuSidebar {
             }
             
             if ( $wgVectorMenuSidebar === true ) {
-                $out->addHTML( '<div id="MenuSidebar" style="display:none">'. wfMessage('MenuSidebar')->parse() . '<p id="vmsTB">' . wfMessage('toolbox')->plain() . '</p><ul id="MSToolbox"></ul>' );
+                $out->addHTML( '<div id="MenuSidebar" style="display:none">'. self::menuMessage( 'MenuSidebar', $skin->getSkinName() )->parse() . '<p id="vmsTB">' . wfMessage('toolbox')->plain() . '</p><ul id="MSToolbox"></ul>' );
                 if ( $wgShowAfterMenuSidebar === true ) {
                         $out->addHTML( '<div>' . wfMessage('MenuSidebarAfter')->parse() . '</div>' );
                 }
@@ -23,5 +23,23 @@ class VectorMenuSidebar {
         }
         
         return true;
+    }
+
+    /**
+     * MediaWiki:<name>-<skin> when that page exists, MediaWiki:<name> otherwise.
+     *
+     * MediaWiki:MenuSidebar may be shared with another skin that renders it itself
+     * (Skin:Arknights does). The per-skin page lets this skin's copy differ without
+     * forking the whole menu: it can be a one-line transclusion of the shared page with
+     * a parameter, e.g. MediaWiki:MenuSidebar-vector = {{MediaWiki:MenuSidebar|vector=1}},
+     * and the shared page wraps what only this skin should show in {{#if:{{{vector|}}}|…}}
+     * (read directly, {{{vector|}}} is empty).
+     */
+    private static function menuMessage( $name, $skinName ) {
+        $msg = wfMessage( $name . '-' . $skinName );
+        if ( $msg->exists() && !$msg->isDisabled() ) {
+            return $msg;
+        }
+        return wfMessage( $name );
     }
 }

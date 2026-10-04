@@ -39,3 +39,16 @@ Notice ：applying custom styles will disable default styles.
 
 ## Content after Sidebar
 add content based on wikitext in `Mediawiki:MenuSidebarAfter` and add `$wgShowAfterMenuSidebar = true;`in `LocalSettings.php` to activate，
+
+## Per-skin menu
+If `Mediawiki:MenuSidebar-vector` exists it is used instead of `Mediawiki:MenuSidebar`. This is for wikis that
+share `Mediawiki:MenuSidebar` with another skin rendering it on its own (e.g. Skin:Arknights) and want a few
+entries to show up in Vector only, without keeping two copies of the menu:
+
+`Mediawiki:MenuSidebar-vector`:
+
+	{{MediaWiki:MenuSidebar|vector=1}}
+
+`Mediawiki:MenuSidebar` (read directly by the other skin, where `{{{vector|}}}` is empty):
+
+	* [[Shown everywhere]]{{#if:{{{vector|}}}|* [[Shown in Vector only]]}}
